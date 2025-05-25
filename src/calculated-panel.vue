@@ -39,9 +39,9 @@ export default defineComponent({
 			type: Boolean,
 			default: false,
 		},
-		filter: {
-			type: Object,
-			default: {},
+		filters: {
+			type: String,
+			default: null,
 		},
 		fields: {
 			type: String,
@@ -74,7 +74,7 @@ export default defineComponent({
 		onMounted(loadCalculatedPanel);
 
 		watch([
-			() => props.filter,
+			() => props.filters,
 			() => props.fields,
 			() => props.expression
 		], () => {
@@ -113,7 +113,7 @@ export default defineComponent({
 					params: {
 						limit: '-1',
 						fields: uniqueFieldNames,
-						filter: props.filter
+						filter: JSON.parse(props.filters)[collectionName] || {}, 
 					},
 				});
 				console.log('--> Setting field data');

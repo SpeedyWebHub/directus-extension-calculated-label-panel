@@ -27,9 +27,9 @@ export default definePanel({
 			},
 		},
 		{
-			field: 'filter',
-			name: '$t:filter',
-			type: 'json',
+			field: 'filters',
+			name: 'filters',
+			type: 'string',
 			meta: {
 				interface: 'input',
 				width: 'full',
