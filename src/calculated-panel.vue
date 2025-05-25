@@ -96,7 +96,7 @@ export default defineComponent({
 		}
 		
 		async function loadCalculatedPanel() {
-
+			console.log('--> In loadCalculatedPanel');
 			const operands = getOperands();
 			sanitizeOperands(operands);
 			const uniqueCollectionNames = [...new Set(operands.map(x => x.collectionName))];
