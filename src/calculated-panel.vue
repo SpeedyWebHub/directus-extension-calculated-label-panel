@@ -102,6 +102,7 @@ export default defineComponent({
 			const uniqueCollectionNames = [...new Set(operands.map(x => x.collectionName))];
 			const collectionsLookup = {};
 			for (const collectionName of uniqueCollectionNames) {
+				console.log(`--> Processing collection ${collectionName}`);
 				const data = [];
 				const uniqueFieldNames = [...new Set(operands.filter(x => x.collectionName === collectionName).map(x => x.fieldName))];
 				const response = await api.get(`/items/${collectionName}`, {
@@ -110,6 +111,7 @@ export default defineComponent({
 						fields: uniqueFieldNames,
 					},
 				});
+				console.log('--> Setting field data');
 				response.data.data.forEach((item: Record<string, any>) => {
 					const itemData = {};
 					uniqueFieldNames.forEach(fieldName => {
@@ -120,7 +122,9 @@ export default defineComponent({
 				collectionsLookup[collectionName] = data;
 			}
 
+			console.log('--> Evaluating expression');
 			const output = math.evaluate(props.expression, collectionsLookup);
+			console.log('--> Setting output');
 			calculatedPanel.value.result = output.toFixed(2);
 		}
 
