@@ -58,6 +58,13 @@ export default defineComponent({
 			calculatedPanelEl,
 			calculatedPanel,
 
+			displayValue(value: string) {
+				if (value === null || value === undefined) {
+					return '[N/A]';
+				}
+				return value;
+			},
+
 			// Errors
 			hasError,
 			errorResponse,
