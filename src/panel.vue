@@ -34,6 +34,7 @@ export default defineComponent({
 		const calculatedPanelEl = ref();
 		const calculatedPanel = ref({ value: ref('666') });
 
+		console.log("--> Calling onMounted");
 		onMounted(setUpCalculatedPanel);
 
 		watch([
@@ -49,6 +50,7 @@ export default defineComponent({
 		
 		//////
 		async function setUpCalculatedPanel() {
+			console.log('--> In setUpCalculatedPanel');
 			calculatedPanel.value = '777';
 		}
 
