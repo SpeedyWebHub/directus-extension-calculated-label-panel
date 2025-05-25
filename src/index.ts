@@ -9,8 +9,17 @@ export default definePanel({
 	component: CalculatedPanelComponent,
 	options: [
 		{
-			field: 'field',
-			name: '$t:panels.metric.field',
+			field: 'fields',
+			name: 'fields',
+			type: 'string',
+			meta: {
+				interface: 'input',
+				width: 'full',
+			},
+		},
+		{
+			field: 'expression',
+			name: 'expression',
 			type: 'string',
 			meta: {
 				interface: 'input',

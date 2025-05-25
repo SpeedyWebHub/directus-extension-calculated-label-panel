@@ -3,6 +3,35 @@ import { useApi, useStores } from '@directus/extensions-sdk';
 import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import { get } from 'lodash';
 import { useI18n } from 'vue-i18n';
+import { create, all } from 'mathjs';
+
+const math = create(all);
+math.import({
+  sum: arr => arr.reduce((a, b) => a + b, 0),
+  avg: arr => arr.reduce((a, b) => a + b, 0) / arr.length,
+	count: arr => arr.length,
+	attr: (arr, key) => arr.map(obj => obj[key]),
+	max: arr => Math.max(...arr),
+	min: arr => Math.min(...arr),
+	median: arr => {
+		const sorted = arr.slice().sort((a, b) => a - b);
+		const mid = Math.floor(sorted.length / 2);
+		return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+	},
+	round: (value, precision = 0) => {
+		const factor = Math.pow(10, precision);
+		return Math.round(value * factor) / factor;
+	},
+	ceil: (value, precision = 0) => {
+		const factor = Math.pow(10, precision);
+		return Math.ceil(value * factor) / factor;
+	},
+	floor: (value, precision = 0) => {
+		const factor = Math.pow(10, precision);
+		return Math.floor(value * factor) / factor;
+	},
+	abs: value => Math.abs(value),
+}, { override: true });
 
 export default defineComponent({
 	props: {
@@ -14,18 +43,21 @@ export default defineComponent({
 			type: Object,
 			default: {},
 		},
-		field: {
+		fields: {
 			type: String,
 			default: null,
 		},
+		expression: {
+			type: String,
+			default: null,
+		}
 	},
 	setup(props) {
 		const { t, n } = useI18n();
 		const api = useApi();
 		const { useFieldsStore, usePermissionsStore } = useStores();
 		const { hasPermission } = usePermissionsStore();
-		//const canRead = hasPermission(props.collection, 'read');
-		const canRead = true; // For demonstration purposes, assuming read permission is always true TODO
+		const canRead = getOperands(props).every(x => hasPermission(x.collectionName, 'read'));
 		const hasError = ref<boolean>(false);
 
 		const errorResponse = ref<Record<string, string>>({
@@ -35,52 +67,67 @@ export default defineComponent({
 
 		const isLoading = ref<boolean>(true);
 
-		const fieldsStore = useFieldsStore();
-		const calculatedPanelEl = ref();
-		const calculatedPanel = ref({ result: '666' });
+		//const fieldsStore = useFieldsStore();
+		//const calculatedPanelEl = ref();
+		const calculatedPanel = ref({ result: 'Calculating...' });
 
-		console.log("--> Calling onMounted");
-		onMounted(setUpCalculatedPanel);
+		onMounted(loadCalculatedPanel);
 
 		watch([
 			() => props.filter,
-			() => props.field
+			() => props.fields,
+			() => props.expressions
 		], () => {
-			setUpCalculatedPanel();
+			loadCalculatedPanel();
 		});
 
 		onUnmounted(() => {
 		});
+
+		function getOperands(props) {
+			return props.fields ? props.fields.split(',').map(x => (()=>{const p=x.trim().split('.'); return {collectionName: p[0] ?? 'unknown', fieldName: p[1] ?? 'unknown'}})()) : [];
+		}
+
+		function sanitizeOperands(operands) {
+			for (let i = 0; i < operands.length; i++) {
+				operands[i].collectionName = operands[i].collectionName.replace(/[^0-9a-zA-Z_-]/g, '');
+				operands[i].fieldName = operands[i].fieldName.replace(/[^0-9a-zA-Z_-]/g, '');
+			}
+		}
 		
-		//////
-		async function setUpCalculatedPanel() {
-			console.log(`--> In setUpCalculatedPanel (filter=${props.filter}, field=${props.field})`);
-			//calculatedPanel.value.result = '777';
-			const response = await api.get(`/items/income`, {
-				params: {
-					limit: '-1',
-					filter: props.filter,
-					fields: [props.field],
-					//sort: [props.series, props.xAxis],
-				},
-			});
-			let sum = 0;
-			response.data.data.forEach((item: Record<string, any>) => {
-				const field_value = get(item, props.field, null);
-				if (field_value !== null && field_value !== undefined) {
-					const value = parseFloat(field_value);
-					if (!isNaN(value)) {
-						sum += value;
-					}
-				}
-			});
-			calculatedPanel.value.result = sum.toFixed(2);
+		async function loadCalculatedPanel() {
+
+			const operands = getOperands();
+			sanitizeOperands(operands);
+			const uniqueCollectionNames = [...new Set(operands.map(x => x.collectionName))];
+			const collectionsLookup = {};
+			for (const collectionName of uniqueCollectionNames) {
+				const data = [];
+				const uniqueFieldNames = [...new Set(operands.filter(x => x.collectionName === collectionName).map(x => x.fieldName))];
+				const response = await api.get(`/items/${collectionName}`, {
+					params: {
+						limit: '-1',
+						fields: uniqueFieldNames,
+					},
+				});
+				response.data.data.forEach((item: Record<string, any>) => {
+					const itemData = {};
+					uniqueFieldNames.forEach(fieldName => {
+						itemData[fieldName] = get(item, fieldName, null);
+					});
+					data.push(itemData);
+				});
+				collectionsLookup[collectionName] = data;
+			}
+
+			const output = math.evaluate(props.expression, collectionsLookup);
+			calculatedPanel.value.result = output.toFixed(2);
 		}
 
 		return {
 			t,
 			isLoading,
-			calculatedPanelEl,
+			//calculatedPanelEl,
 			calculatedPanel,
 
 			displayValue(value: string) {
@@ -98,7 +145,6 @@ export default defineComponent({
 			canRead,
 
 		};
-		//////
 	},
 });
 </script>
