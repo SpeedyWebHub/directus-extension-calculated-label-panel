@@ -85,7 +85,7 @@ export default defineComponent({
 			class="calculated-panel-text"
 			:style="{ color, fontWeight, textAlign, fontStyle, fontSize: fontSize !== 'auto' ? fontSize : undefined }"
 		>
-			{{ displayValue(calculatedPanel.value) }}
+			{{ calculatedPanel.value }}
 		</p>
 	</div>
 </template>
