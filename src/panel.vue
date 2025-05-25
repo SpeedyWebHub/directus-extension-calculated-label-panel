@@ -1,6 +1,7 @@
 <script lang="ts">
 import { useApi, useStores } from '@directus/extensions-sdk';
 import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import { get } from 'lodash';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
@@ -51,7 +52,26 @@ export default defineComponent({
 		//////
 		async function setUpCalculatedPanel() {
 			console.log('--> In setUpCalculatedPanel');
-			calculatedPanel.value.result = '777';
+			//calculatedPanel.value.result = '777';
+			const response = await api.get(`/items/income`, {
+				params: {
+					limit: '-1',
+					filter: props.filter,
+					fields: [props.field],
+					//sort: [props.series, props.xAxis],
+				},
+			});
+			let sum = 0;
+			response.data.data.forEach((item: Record<string, any>) => {
+				const field_value = get(item, props.field, null);
+				if (field_value !== null && field_value !== undefined) {
+					const value = parseFloat(field_value);
+					if (!isNaN(value)) {
+						sum += value;
+					}
+				}
+			});
+			calculatedPanel.value.result = sum.toFixed(2);
 		}
 
 		return {
