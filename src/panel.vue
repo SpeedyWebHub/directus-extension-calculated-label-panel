@@ -32,7 +32,7 @@ export default defineComponent({
 
 		const fieldsStore = useFieldsStore();
 		const calculatedPanelEl = ref();
-		const calculatedPanel = ref({ value: ref('666') });
+		const calculatedPanel = ref({ result: '666' });
 
 		console.log("--> Calling onMounted");
 		onMounted(setUpCalculatedPanel);
@@ -51,7 +51,7 @@ export default defineComponent({
 		//////
 		async function setUpCalculatedPanel() {
 			console.log('--> In setUpCalculatedPanel');
-			calculatedPanel.value = '777';
+			calculatedPanel.value.result = '777';
 		}
 
 		return {
@@ -87,7 +87,7 @@ export default defineComponent({
 			class="calculated-panel-text"
 			:style="{ color, fontWeight, textAlign, fontStyle, fontSize: fontSize !== 'auto' ? fontSize : undefined }"
 		>
-			{{ calculatedPanel.value }}
+			{{ displayValue(calculatedPanel.value.result) }}
 		</p>
 	</div>
 </template>
