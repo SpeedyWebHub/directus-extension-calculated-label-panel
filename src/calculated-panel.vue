@@ -7,14 +7,14 @@ import { create, all } from 'mathjs';
 
 const math = create(all);
 math.import({
-  sum: arr => arr.reduce((a, b) => a + b, 0),
-  avg: arr => arr.reduce((a, b) => a + b, 0) / arr.length,
+  sum: arr => arr.map(x=>Number(x)).filter(x=>!isNaN(x)).reduce((a, b) => a + b, 0),
+  avg: arr => arr.map(x=>Number(x)).filter(x=>!isNaN(x)).reduce((a, b) => a + b, 0) / arr.length,
 	count: arr => arr.length,
 	attr: (arr, key) => arr.map(obj => obj[key]),
-	max: arr => Math.max(...arr),
-	min: arr => Math.min(...arr),
+	max: arr => Math.max(...arr.map(x=>Number(x)).filter(x=>!isNaN(x))),
+	min: arr => Math.min(...arr.map(x=>Number(x)).filter(x=>!isNaN(x))),
 	median: arr => {
-		const sorted = arr.slice().sort((a, b) => a - b);
+		const sorted = arr.map(x=>Number(x)).filter(x=>!isNaN(x)).slice().sort((a, b) => a - b);
 		const mid = Math.floor(sorted.length / 2);
 		return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 	},
