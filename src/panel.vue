@@ -14,6 +14,14 @@ export default defineComponent({
 			type: String,
 			default: '',
 		},
+		filter: {
+			type: Object,
+			default: {},
+		},
+		field: {
+			type: String,
+			default: null,
+		},
 	},
 	setup(props) {
 		const { t, n } = useI18n();
@@ -51,7 +59,7 @@ export default defineComponent({
 		
 		//////
 		async function setUpCalculatedPanel() {
-			console.log('--> In setUpCalculatedPanel');
+			console.log(`--> In setUpCalculatedPanel (filter=${props.filter}, field=${props.field})`);
 			//calculatedPanel.value.result = '777';
 			const response = await api.get(`/items/income`, {
 				params: {
