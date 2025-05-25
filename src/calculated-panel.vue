@@ -113,6 +113,7 @@ export default defineComponent({
 					params: {
 						limit: '-1',
 						fields: uniqueFieldNames,
+						filter: props.filter
 					},
 				});
 				console.log('--> Setting field data');
