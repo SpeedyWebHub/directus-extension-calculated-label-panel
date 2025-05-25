@@ -97,10 +97,14 @@ export default defineComponent({
 		
 		async function loadCalculatedPanel() {
 			console.log('--> In loadCalculatedPanel');
+			console.log('Calling getOperands')
 			const operands = getOperands();
+			console.log('Calling sanitizeOperands');
 			sanitizeOperands(operands);
+			console.log('Setting uniqueCollectionNames');
 			const uniqueCollectionNames = [...new Set(operands.map(x => x.collectionName))];
 			const collectionsLookup = {};
+			console.log('Iterating over collections');
 			for (const collectionName of uniqueCollectionNames) {
 				console.log(`--> Processing collection ${collectionName}`);
 				const data = [];
