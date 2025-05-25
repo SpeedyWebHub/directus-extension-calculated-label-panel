@@ -9,8 +9,8 @@ export default definePanel({
 	component: PanelComponent,
 	options: [
 		{
-			field: 'text',
-			name: 'Text',
+			field: 'field',
+			name: '$t:panels.metric.field',
 			type: 'string',
 			meta: {
 				interface: 'input',
@@ -18,29 +18,12 @@ export default definePanel({
 			},
 		},
 		{
-			field: 'field',
-			type: 'string',
-			name: '$t:panels.metric.field',
-			meta: {
-				interface: 'system-field',
-				// options: {
-				// 	collectionField: 'collection',
-				// 	allowPrimaryKey: true,
-				// 	allowNone: true,
-				// },
-				width: 'half',
-			},
-		},
-		{
 			field: 'filter',
-			type: 'json',
 			name: '$t:filter',
+			type: 'json',
 			meta: {
-				interface: 'system-filter',
-				// options: {
-				// 	collectionField: 'collection',
-				// 	relationalFieldSelectable: false,
-				// },
+				interface: 'input',
+				width: 'full',
 			},
 		}
 	],

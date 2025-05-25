@@ -10,10 +10,6 @@ export default defineComponent({
 			type: Boolean,
 			default: false,
 		},
-		text: {
-			type: String,
-			default: '',
-		},
 		filter: {
 			type: Object,
 			default: {},
@@ -47,14 +43,13 @@ export default defineComponent({
 		onMounted(setUpCalculatedPanel);
 
 		watch([
-
+			() => props.filter,
+			() => props.field
 		], () => {
-			//TODO cleanup
 			setUpCalculatedPanel();
 		});
 
 		onUnmounted(() => {
-			//TODO cleanup
 		});
 		
 		//////
