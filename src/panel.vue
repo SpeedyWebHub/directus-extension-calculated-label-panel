@@ -32,7 +32,7 @@ export default defineComponent({
 
 		const fieldsStore = useFieldsStore();
 		const calculatedPanelEl = ref();
-		const calculatedPanel = { value: '666' };
+		const calculatedPanel = ref({ value: '666' });
 
 		onMounted(setUpCalculatedPanel);
 
