@@ -129,7 +129,8 @@ export default defineComponent({
 			console.log('--> Evaluating expression');
 			const output = math.evaluate(props.expression, collectionsLookup);
 			console.log('--> Setting output');
-			calculatedPanel.value.result = output.toFixed(2);
+			const outputNumber = Number(output);
+			calculatedPanel.value.result = isNaN(outputNumber) ? output : outputNumber.toFixed(2);
 		}
 
 		return {
