@@ -76,7 +76,7 @@ export default defineComponent({
 		watch([
 			() => props.filter,
 			() => props.fields,
-			() => props.expressions
+			() => props.expression
 		], () => {
 			loadCalculatedPanel();
 		});
