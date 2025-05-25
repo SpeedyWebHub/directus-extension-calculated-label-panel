@@ -98,7 +98,7 @@ export default defineComponent({
 		async function loadCalculatedPanel() {
 			console.log('--> In loadCalculatedPanel');
 			console.log('Calling getOperands')
-			const operands = getOperands();
+			const operands = getOperands(props);
 			console.log('Calling sanitizeOperands');
 			sanitizeOperands(operands);
 			console.log('Setting uniqueCollectionNames');
