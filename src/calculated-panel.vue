@@ -318,8 +318,7 @@ export default defineComponent({
 		}
 
 		const color = computed(() => {
-			return 'red'; //TODO fix
-			/*console.log(`--> In color (computed): calculatedPanel.value.result = ${calculatedPanel.value.result}`);
+			console.log(`--> In color (computed): calculatedPanel.value.result = ${calculatedPanel.value.result}`);
 			if (isNil(calculatedPanel.value.result)) return null;
 
 			let matchingFormat = null;
@@ -365,7 +364,7 @@ export default defineComponent({
 				}
 
 				return false;
-			}*/
+			}
 		});
 
 		return {
