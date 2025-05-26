@@ -318,6 +318,7 @@ export default defineComponent({
 		}
 
 		const color = computed(() => {
+			console.log(`--> In color (computed): calculatedPanel.value.result = ${calculatedPanel.value.result}`);
 			if (isNil(calculatedPanel.value.result)) return null;
 
 			let matchingFormat = null;
@@ -331,6 +332,7 @@ export default defineComponent({
 			return matchingFormat?.color || 'var(--theme--primary)';
 
 			function matchesOperator(format: Record<string, any>) {
+				console.log(`In matchesOperator: calculatedPanel.value.result = ${calculatedPanel.value.result}`);
 				if (typeof calculatedPanel.value.result === 'string') {
 					const value = calculatedPanel.value.result;
 					const compareValue = format.value ?? '';
