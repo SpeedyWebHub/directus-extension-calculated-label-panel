@@ -1,9 +1,9 @@
 <script lang="ts">
 import { useApi, useStores } from '@directus/extensions-sdk';
 import { defineComponent, onMounted, onUnmounted, ref, watch, CSSProperties } from 'vue';
-import { useAutoFontFit } from '@/composables/use-auto-fit-text';
-import { formatNumber } from '@/utils/format-number';
-import type { Style, Notation, Unit } from '@/utils/format-number';
+import { useAutoFontFit } from './composables/use-auto-fit-text';
+import { formatNumber } from './utils/format-number';
+import type { Style, Notation, Unit } from './utils/format-number';
 import { get } from 'lodash';
 import { useI18n } from 'vue-i18n';
 import { create, all } from 'mathjs';
