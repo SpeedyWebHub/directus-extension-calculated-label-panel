@@ -36,65 +36,7 @@ math.import({
 	abs: value => Math.abs(value),
 }, { override: true });
 
-// interface Props {
-// 	filters: string | null;
-// 	fields: string | null;
-// 	expression: string | null;
-// 	showHeader?: boolean;
-// 	notation?: Notation;
-// 	numberStyle?: Style;
-// 	unit?: Unit;
-// 	prefix?: string | null;
-// 	suffix?: string | null;
-// 	minimumFractionDigits?: number;
-// 	maximumFractionDigits?: number;
-// 	conditionalFormatting?: Record<string, any>[] | null;
-// 	textAlign?: CSSProperties['text-align'];
-// 	fontSize?: string;
-// 	fontWeight?: number | undefined;
-// 	fontStyle?: string | undefined;
-// 	font?: 'sans-serif' | 'serif' | 'monospace';
-// }
-
-// /*
-// 	Converts to {type, default} form
-//  */
-// function getPropsData(props) {
-// 	return Object.entries(props).reduce((acc, [key, value]) => {
-// 		if (typeof value === 'object' && !Array.isArray(value)) {
-// 			acc[key] = { type: Object, default: () => value };
-// 		} else if (typeof value === 'string') {
-// 			acc[key] = { type: String, default: value };
-// 		} else if (typeof value === 'number') {
-// 			acc[key] = { type: Number, default: value };
-// 		} else if (typeof value === 'boolean') {
-// 			acc[key] = { type: Boolean, default: value };
-// 		} else {
-// 			acc[key] = { type: null, default: value };
-// 		}
-// 		return acc;
-// 	}, {});
-// }
-
 export default defineComponent({ 
-	// props: withDefaults(defineProps<Props>(), {
-	// 	filters: null,
-	// 	fields: null,
-	// 	expression: null,
-	// 	showHeader: false,
-	// 	notation: 'standard',
-	// 	numberStyle: 'decimal',
-	// 	unit: undefined,
-	// 	prefix: '',
-	// 	suffix: '',
-	// 	minimumFractionDigits: 0,
-	// 	maximumFractionDigits: 0,
-	// 	conditionalFormatting: () => [],
-	// 	fontSize: 'auto',
-	// 	fontWeight: 800,
-	// 	font: 'sans-serif',
-	// 	textAlign: 'center',
-	// }),
 	props: {
 		filters: {
 			type: String,
@@ -180,19 +122,17 @@ export default defineComponent({
 
 		const isLoading = ref<boolean>(true);
 
-		//const fieldsStore = useFieldsStore();
-		//const calculatedPanelEl = ref();
-		const calculatedPanel = ref({ result: 'Calculating...' });
+		const calculatedLabelPanel = ref({ result: 'Calculating...' });
 
-		const calculatedPanelContainer = ref<HTMLDivElement | null>(null);
-		const calculatedPanelText = ref<HTMLParagraphElement | null>(null);
+		const calculatedLabelPanelContainer = ref<HTMLDivElement | null>(null);
+		const calculatedLabelPanelText = ref<HTMLParagraphElement | null>(null);
 
-		const { adjustFontSize } = useAutoFontFit(calculatedPanelContainer, calculatedPanelText);
+		const { adjustFontSize } = useAutoFontFit(calculatedLabelPanelContainer, calculatedLabelPanelText);
 
 		let resizeObserver: ResizeObserver | null = null;
 
 		onMounted(() => {
-			loadCalculatedPanel();
+			loadCalculatedLabelPanel();
 			updateFit();
 		});
 
@@ -201,7 +141,7 @@ export default defineComponent({
 			() => props.fields,
 			() => props.expression
 		], () => {
-			loadCalculatedPanel();
+			loadCalculatedLabelPanel();
 		});
 
 		onUpdated(() => {
@@ -226,17 +166,17 @@ export default defineComponent({
 		}
 		
 		async function loadCalculatedPanel() {
-			console.log('--> In loadCalculatedPanel');
-			console.log('Calling getOperands')
+			console.log('[calculated-label] --> In loadCalculatedPanel');
+			console.log('[calculated-label] Calling getOperands')
 			const operands = getOperands(props);
-			console.log('Calling sanitizeOperands');
+			console.log('[calculated-label] Calling sanitizeOperands');
 			sanitizeOperands(operands);
-			console.log('Setting uniqueCollectionNames');
+			console.log('[calculated-label] Setting uniqueCollectionNames');
 			const uniqueCollectionNames = [...new Set(operands.map(x => x.collectionName))];
 			const collectionsLookup = {};
-			console.log('Iterating over collections');
+			console.log('[calculated-label] Iterating over collections');
 			for (const collectionName of uniqueCollectionNames) {
-				console.log(`--> Processing collection ${collectionName}`);
+				console.log(`[calculated-label] --> Processing collection ${collectionName}`);
 				const data = [];
 				const uniqueFieldNames = [...new Set(operands.filter(x => x.collectionName === collectionName).map(x => x.fieldName))];
 				const response = await api.get(`/items/${collectionName}`, {
@@ -246,7 +186,7 @@ export default defineComponent({
 						filter: JSON.parse(props.filters)[collectionName] || {}, 
 					},
 				});
-				console.log('--> Setting field data');
+				console.log('[calculated-label] --> Setting field data');
 				response.data.data.forEach((item: Record<string, any>) => {
 					const itemData = {};
 					uniqueFieldNames.forEach(fieldName => {
@@ -257,18 +197,18 @@ export default defineComponent({
 				collectionsLookup[collectionName] = data;
 			}
 
-			console.log('--> Evaluating expression');
+			console.log('[calculated-label] --> Evaluating expression');
 			const output = math.evaluate(props.expression, collectionsLookup);
-			console.log(`props.expression = ${props.expression}`);
-			console.log(`collectionsLookup = ${JSON.stringify(collectionsLookup)}`);
-			console.log(`output = ${output}`);
-			console.log('--> Setting output');
+			console.log(`[calculated-label] props.expression = ${props.expression}`);
+			console.log(`[calculated-label] collectionsLookup = ${JSON.stringify(collectionsLookup)}`);
+			console.log(`[calculated-label] output = ${output}`);
+			console.log('[calculated-label] --> Setting output');
 			const outputNumber = Number(output);
-			calculatedPanel.value.result = isNaN(outputNumber) ? output : outputNumber.toFixed(2);
+			calculatedLabelPanel.value.result = isNaN(outputNumber) ? output : outputNumber.toFixed(2);
 		}
 
 		function adjustPadding() {
-			const container = calculatedPanelContainer.value;
+			const container = calculatedLabelPanelContainer.value;
 			if (!container) return;
 
 			const paddingWidth = container.offsetWidth * 0.05;
@@ -303,7 +243,7 @@ export default defineComponent({
 			adjustFontSize();
 
 			if (!resizeObserver) {
-				const container = calculatedPanelContainer.value;
+				const container = calculatedLabelPanelContainer.value;
 				if (!container) return;
 
 				// Create a ResizeObserver to watch for changes in the container's dimensions
@@ -318,8 +258,8 @@ export default defineComponent({
 		}
 
 		const color = computed(() => {
-			console.log(`--> In color (computed): calculatedPanel.value.result = ${calculatedPanel.value.result}`);
-			if (isNil(calculatedPanel.value.result)) return null;
+			console.log(`[calculated-label] --> In color (computed): calculatedLabelPanel.value.result = ${calculatedLabelPanel.value.result}`);
+			if (isNil(calculatedLabelPanel.value.result)) return null;
 
 			let matchingFormat = null;
 
@@ -332,9 +272,9 @@ export default defineComponent({
 			return matchingFormat?.color || 'var(--theme--primary)';
 
 			function matchesOperator(format: Record<string, any>) {
-				console.log(`In matchesOperator: calculatedPanel.value.result = ${calculatedPanel.value.result}`);
-				if (typeof calculatedPanel.value.result === 'string') {
-					const value = calculatedPanel.value.result;
+				console.log(`[calculated-label] In matchesOperator: calculatedLabelPanel.value.result = ${calculatedLabelPanel.value.result}`);
+				if (typeof calculatedLabelPanel.value.result === 'string') {
+					const value = calculatedLabelPanel.value.result;
 					const compareValue = format.value ?? '';
 
 					switch (format.operator || '>=') {
@@ -344,7 +284,7 @@ export default defineComponent({
 							return value !== compareValue;
 					}
 				} else {
-					const value = Number(calculatedPanel.value.result);
+					const value = Number(calculatedLabelPanel.value.result);
 					const compareValue = Number(format.value ?? 0);
 
 					switch (format.operator || '>=') {
@@ -370,10 +310,9 @@ export default defineComponent({
 		return {
 			t,
 			isLoading,
-			//calculatedPanelEl,
-			calculatedPanel,
-			calculatedPanelContainer,
-			calculatedPanelText,
+			calculatedLabelPanel,
+			calculatedLabelPanelContainer,
+			calculatedLabelPanelText,
 
 			displayValue(value: string) {
 				if (value === null || value === undefined) {
@@ -408,14 +347,14 @@ export default defineComponent({
 </script>
 
 <template>
-	<div ref="calculatedPanelContainer" class="calculated-panel type-title selectable" :class="[font, { 'has-header': showHeader }]">
+	<div ref="calculatedLabelPanelContainer" class="calculated-panel type-title selectable" :class="[font, { 'has-header': showHeader }]">
 		<p
-			ref="calculatedPanelText"
+			ref="calculatedLabelPanelText"
 			class="calculated-panel-text"
 			:style="{ color, fontWeight, textAlign, fontStyle, fontSize: fontSize !== 'auto' ? fontSize : undefined }"
 		>
 			{{ prefix }}
-			{{ displayValue(calculatedPanel.result) }}
+			{{ displayValue(calculatedLabelPanel.result) }}
 			{{ suffix }}
 		</p>
 	</div>

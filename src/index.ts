@@ -1,12 +1,12 @@
 import { definePanel } from '@directus/extensions-sdk';
-import CalculatedPanelComponent from './calculated-panel.vue';
+import CalculatedLabelPanelComponent from './calculated-label-panel.vue';
 
 export default definePanel({
-	id: 'panel-calculated',
-	name: 'Calculated Panel',
+	id: 'calculated-label',
+	name: 'Calculated Label',
 	icon: 'box',
 	description: 'This is a flexible panel that can display calculated values.',
-	component: CalculatedPanelComponent,
+	component: CalculatedLabelPanelComponent,
 	options: ({ options }): Array<object> => {
 		return [
 		{
