@@ -303,7 +303,7 @@ export default defineComponent({
 			adjustFontSize();
 
 			if (!resizeObserver) {
-				const container = labelContainer.value;
+				const container = calculatedPanelContainer.value;
 				if (!container) return;
 
 				// Create a ResizeObserver to watch for changes in the container's dimensions
@@ -318,7 +318,8 @@ export default defineComponent({
 		}
 
 		const color = computed(() => {
-			console.log(`--> In color (computed): calculatedPanel.value.result = ${calculatedPanel.value.result}`);
+			return 'red'; //TODO fix
+			/*console.log(`--> In color (computed): calculatedPanel.value.result = ${calculatedPanel.value.result}`);
 			if (isNil(calculatedPanel.value.result)) return null;
 
 			let matchingFormat = null;
@@ -364,7 +365,7 @@ export default defineComponent({
 				}
 
 				return false;
-			}
+			}*/
 		});
 
 		return {
