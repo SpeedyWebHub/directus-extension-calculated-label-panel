@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useApi, useStores } from '@directus/extensions-sdk';
-import { defineComponent, onMounted, onUnmounted, ref, watch, CSSProperties } from 'vue';
+import { defineComponent, onMounted, onUpdated, onBeforeUnmount, onUnmounted, ref, computed, watch, CSSProperties } from 'vue';
 import { useAutoFontFit } from './composables/use-auto-fit-text';
 import { formatNumber } from './utils/format-number';
 import type { Style, Notation, Unit } from './utils/format-number';
@@ -417,7 +417,7 @@ export default defineComponent({
 		>
 			{{ prefix }}
 			{{ displayValue(calculatedPanel.result) }}
-			{{  suffix }}
+			{{ suffix }}
 		</p>
 	</div>
 </template>
