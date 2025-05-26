@@ -165,8 +165,8 @@ export default defineComponent({
 			}
 		}
 		
-		async function loadCalculatedPanel() {
-			console.log('[calculated-label] --> In loadCalculatedPanel');
+		async function loadCalculatedLabelPanel() {
+			console.log('[calculated-label] --> In loadCalculatedLabelPanel');
 			console.log('[calculated-label] Calling getOperands')
 			const operands = getOperands(props);
 			console.log('[calculated-label] Calling sanitizeOperands');
