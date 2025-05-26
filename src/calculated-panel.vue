@@ -1,6 +1,9 @@
 <script lang="ts">
 import { useApi, useStores } from '@directus/extensions-sdk';
-import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch, CSSProperties } from 'vue';
+import { useAutoFontFit } from '@/composables/use-auto-fit-text';
+import { formatNumber } from '@/utils/format-number';
+import type { Style, Notation, Unit } from '@/utils/format-number';
 import { get } from 'lodash';
 import { useI18n } from 'vue-i18n';
 import { create, all } from 'mathjs';
@@ -33,27 +36,65 @@ math.import({
 	abs: value => Math.abs(value),
 }, { override: true });
 
+interface Props {
+	filters: string | null;
+	fields: string | null;
+	expression: string | null;
+	showHeader?: boolean;
+	notation?: Notation;
+	numberStyle?: Style;
+	unit?: Unit;
+	prefix?: string | null;
+	suffix?: string | null;
+	minimumFractionDigits?: number;
+	maximumFractionDigits?: number;
+	conditionalFormatting?: Record<string, any>[] | null;
+	textAlign?: CSSProperties['text-align'];
+	fontSize?: string;
+	fontWeight?: number | undefined;
+	fontStyle?: string | undefined;
+	font?: 'sans-serif' | 'serif' | 'monospace';
+}
+
 export default defineComponent({
-	props: {
-		showHeader: {
-			type: Boolean,
-			default: false,
-		},
-		filters: {
-			type: String,
-			default: null,
-		},
-		fields: {
-			type: String,
-			default: null,
-		},
-		expression: {
-			type: String,
-			default: null,
-		}
-	},
+	props: withDefaults(defineProps<Props>(), {
+		filters: null,
+		fields: null,
+		expression: null,
+		showHeader: false,
+		notation: 'standard',
+		numberStyle: 'decimal',
+		unit: undefined,
+		prefix: '',
+		suffix: '',
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+		conditionalFormatting: () => [],
+		fontSize: 'auto',
+		fontWeight: 800,
+		font: 'sans-serif',
+		textAlign: 'center',
+	}),
+	// props: {
+	// 	showHeader: {
+	// 		type: Boolean,
+	// 		default: false,
+	// 	},
+	// 	filters: {
+	// 		type: String,
+	// 		default: null,
+	// 	},
+	// 	fields: {
+	// 		type: String,
+	// 		default: null,
+	// 	},
+	// 	expression: {
+	// 		type: String,
+	// 		default: null,
+	// 	}
+	// },
 	setup(props) {
-		const { t, n } = useI18n();
+		const { t, n, locale } = useI18n();
 		const api = useApi();
 		const { useFieldsStore, usePermissionsStore } = useStores();
 		const { hasPermission } = usePermissionsStore();
@@ -71,7 +112,17 @@ export default defineComponent({
 		//const calculatedPanelEl = ref();
 		const calculatedPanel = ref({ result: 'Calculating...' });
 
-		onMounted(loadCalculatedPanel);
+		const calculatedPanelContainer = ref<HTMLDivElement | null>(null);
+		const calculatedPanelText = ref<HTMLParagraphElement | null>(null);
+
+		const { adjustFontSize } = useAutoFontFit(calculatedPanelContainer, calculatedPanelText);
+
+		let resizeObserver: ResizeObserver | null = null;
+
+		onMounted(() => {
+			loadCalculatedPanel();
+			updateFit();
+		});
 
 		watch([
 			() => props.filters,
@@ -81,6 +132,13 @@ export default defineComponent({
 			loadCalculatedPanel();
 		});
 
+		onUpdated(() => {
+			updateFit();
+		})
+
+		onBeforeUnmount(() => {
+			unmountResizeObserver();
+		});
 		onUnmounted(() => {
 		});
 
@@ -137,18 +195,131 @@ export default defineComponent({
 			calculatedPanel.value.result = isNaN(outputNumber) ? output : outputNumber.toFixed(2);
 		}
 
+		function adjustPadding() {
+			const container = calculatedPanelContainer.value;
+			if (!container) return;
+
+			const paddingWidth = container.offsetWidth * 0.05;
+			const paddingHeight = container.offsetHeight * 0.05;
+
+			const padding = Math.round(Math.max(8, Math.min(paddingWidth, paddingHeight)));
+
+			if (props.showHeader == true) {
+				container.style.padding = '0px 12px 12px 12px';
+			} else {
+				container.style.padding = `${padding}px`;
+			}
+
+			return;
+		}
+
+		function unmountResizeObserver() {
+			if (resizeObserver) {
+				resizeObserver.disconnect();
+				resizeObserver = null;
+			}
+		}
+
+		async function updateFit() {
+			if (props.fontSize !== 'auto' || !props.data || props.data.length === 0) {
+				unmountResizeObserver();
+				return;
+			}
+
+			await document.fonts.ready;
+			adjustPadding();
+			adjustFontSize();
+
+			if (!resizeObserver) {
+				const container = labelContainer.value;
+				if (!container) return;
+
+				// Create a ResizeObserver to watch for changes in the container's dimensions
+				resizeObserver = new ResizeObserver(() => {
+					updateFit();
+				});
+
+				resizeObserver.observe(container);
+			}
+
+			adjustFontSize();
+		}
+
+		const color = computed(() => {
+			if (isNil(calculatedPanel.value.result)) return null;
+
+			let matchingFormat = null;
+
+			for (const format of props.conditionalFormatting || []) {
+				if (matchesOperator(format)) {
+					matchingFormat = format;
+				}
+			}
+
+			return matchingFormat?.color || 'var(--theme--primary)';
+
+			function matchesOperator(format: Record<string, any>) {
+				if (typeof calculatedPanel.value.result === 'string') {
+					const value = calculatedPanel.value.result;
+					const compareValue = format.value ?? '';
+
+					switch (format.operator || '>=') {
+						case '=':
+							return value === compareValue;
+						case '!=':
+							return value !== compareValue;
+					}
+				} else {
+					const value = Number(calculatedPanel.value.result);
+					const compareValue = Number(format.value ?? 0);
+
+					switch (format.operator || '>=') {
+						case '=':
+							return value === compareValue;
+						case '!=':
+							return value !== compareValue;
+						case '>':
+							return value > compareValue;
+						case '>=':
+							return value >= compareValue;
+						case '<':
+							return value < compareValue;
+						case '<=':
+							return value < compareValue;
+					}
+				}
+
+				return false;
+			}
+		});
+
 		return {
 			t,
 			isLoading,
 			//calculatedPanelEl,
 			calculatedPanel,
+			calculatedPanelContainer,
+			calculatedPanelText,
 
 			displayValue(value: string) {
 				if (value === null || value === undefined) {
 					return '[N/A]';
 				}
-				return value;
+				const valueNumber = Number(value);
+				if (isNaN(valueNumber)) {
+					return value;
+				} else {
+					return formatNumber(valueNumber, locale.value, {
+						notation: props.notation,
+						style: props.numberStyle,
+						unit: props.unit,
+						minimumFractionDigits: props.minimumFractionDigits,
+						maximumFractionDigits: props.maximumFractionDigits,
+						currency: props.numberStyle === 'currency' ? String(props.unit) : undefined,
+					});
+				}
 			},
+			color,
 
 			// Errors
 			hasError,
@@ -165,11 +336,13 @@ export default defineComponent({
 <template>
 	<div ref="calculatedPanelContainer" class="calculated-panel type-title selectable" :class="[font, { 'has-header': showHeader }]">
 		<p
-			ref="labelText"
+			ref="calculatedPanelText"
 			class="calculated-panel-text"
 			:style="{ color, fontWeight, textAlign, fontStyle, fontSize: fontSize !== 'auto' ? fontSize : undefined }"
 		>
+			{{ prefix }}
 			{{ displayValue(calculatedPanel.result) }}
+			{{  suffix }}
 		</p>
 	</div>
 </template>
