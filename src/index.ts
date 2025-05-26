@@ -7,8 +7,8 @@ export default definePanel({
 	icon: 'box',
 	description: 'This is a flexible panel that can display calculated values.',
 	component: CalculatedPanelComponent,
-	options: ({ options }) => {
-		return [
+	options: /*({ options }): Array<object> => {
+		return*/ [
 		{
 			field: 'fields',
 			name: 'fields',
@@ -147,7 +147,7 @@ export default definePanel({
 			},
 			meta: {
 				interface: 'input',
-				hidden: options?.numberStyle !== 'unit' && options?.numberStyle !== 'currency',
+				hidden: false/*options?.numberStyle !== 'unit' && options?.numberStyle !== 'currency',*/
 			},
 		},
 		{
@@ -414,7 +414,7 @@ export default definePanel({
 				default_value: 'sans-serif',
 			},
 		},
-	];},
+	]/*;}*/,
 	minWidth: 12,
 	minHeight: 8,
 });
