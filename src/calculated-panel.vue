@@ -4,7 +4,7 @@ import { defineComponent, onMounted, onUnmounted, ref, watch, CSSProperties } fr
 import { useAutoFontFit } from './composables/use-auto-fit-text';
 import { formatNumber } from './utils/format-number';
 import type { Style, Notation, Unit } from './utils/format-number';
-import { get } from 'lodash';
+import { get, isNil } from 'lodash';
 import { useI18n } from 'vue-i18n';
 import { create, all } from 'mathjs';
 
@@ -36,63 +36,135 @@ math.import({
 	abs: value => Math.abs(value),
 }, { override: true });
 
-interface Props {
-	filters: string | null;
-	fields: string | null;
-	expression: string | null;
-	showHeader?: boolean;
-	notation?: Notation;
-	numberStyle?: Style;
-	unit?: Unit;
-	prefix?: string | null;
-	suffix?: string | null;
-	minimumFractionDigits?: number;
-	maximumFractionDigits?: number;
-	conditionalFormatting?: Record<string, any>[] | null;
-	textAlign?: CSSProperties['text-align'];
-	fontSize?: string;
-	fontWeight?: number | undefined;
-	fontStyle?: string | undefined;
-	font?: 'sans-serif' | 'serif' | 'monospace';
-}
+// interface Props {
+// 	filters: string | null;
+// 	fields: string | null;
+// 	expression: string | null;
+// 	showHeader?: boolean;
+// 	notation?: Notation;
+// 	numberStyle?: Style;
+// 	unit?: Unit;
+// 	prefix?: string | null;
+// 	suffix?: string | null;
+// 	minimumFractionDigits?: number;
+// 	maximumFractionDigits?: number;
+// 	conditionalFormatting?: Record<string, any>[] | null;
+// 	textAlign?: CSSProperties['text-align'];
+// 	fontSize?: string;
+// 	fontWeight?: number | undefined;
+// 	fontStyle?: string | undefined;
+// 	font?: 'sans-serif' | 'serif' | 'monospace';
+// }
 
-export default defineComponent({
-	props: withDefaults(defineProps<Props>(), {
-		filters: null,
-		fields: null,
-		expression: null,
-		showHeader: false,
-		notation: 'standard',
-		numberStyle: 'decimal',
-		unit: undefined,
-		prefix: '',
-		suffix: '',
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-		conditionalFormatting: () => [],
-		fontSize: 'auto',
-		fontWeight: 800,
-		font: 'sans-serif',
-		textAlign: 'center',
-	}),
-	// props: {
-	// 	showHeader: {
-	// 		type: Boolean,
-	// 		default: false,
-	// 	},
-	// 	filters: {
-	// 		type: String,
-	// 		default: null,
-	// 	},
-	// 	fields: {
-	// 		type: String,
-	// 		default: null,
-	// 	},
-	// 	expression: {
-	// 		type: String,
-	// 		default: null,
-	// 	}
-	// },
+// /*
+// 	Converts to {type, default} form
+//  */
+// function getPropsData(props) {
+// 	return Object.entries(props).reduce((acc, [key, value]) => {
+// 		if (typeof value === 'object' && !Array.isArray(value)) {
+// 			acc[key] = { type: Object, default: () => value };
+// 		} else if (typeof value === 'string') {
+// 			acc[key] = { type: String, default: value };
+// 		} else if (typeof value === 'number') {
+// 			acc[key] = { type: Number, default: value };
+// 		} else if (typeof value === 'boolean') {
+// 			acc[key] = { type: Boolean, default: value };
+// 		} else {
+// 			acc[key] = { type: null, default: value };
+// 		}
+// 		return acc;
+// 	}, {});
+// }
+
+export default defineComponent({ 
+	// props: withDefaults(defineProps<Props>(), {
+	// 	filters: null,
+	// 	fields: null,
+	// 	expression: null,
+	// 	showHeader: false,
+	// 	notation: 'standard',
+	// 	numberStyle: 'decimal',
+	// 	unit: undefined,
+	// 	prefix: '',
+	// 	suffix: '',
+	// 	minimumFractionDigits: 0,
+	// 	maximumFractionDigits: 0,
+	// 	conditionalFormatting: () => [],
+	// 	fontSize: 'auto',
+	// 	fontWeight: 800,
+	// 	font: 'sans-serif',
+	// 	textAlign: 'center',
+	// }),
+	props: {
+		filters: {
+			type: String,
+			default: null,
+		},
+		fields: {
+			type: String,
+			default: null,
+		},
+		expression: {
+			type: String,
+			default: null,
+		},
+		showHeader: {
+			type: Boolean,
+			default: false,
+		},
+		notation: {
+			type: String as () => Notation,
+			default: 'standard',
+		},
+		numberStyle: {
+			type: String as () => Style,
+			default: 'decimal',
+		},
+		unit: {
+			type: String as () => Unit,
+			default: undefined,
+		},
+		prefix: {
+			type: String,
+			default: '',
+		},
+		suffix: {
+			type: String,
+			default: '',
+		},
+		minimumFractionDigits: {
+			type: Number,
+			default: 0,
+		},
+		maximumFractionDigits: {
+			type: Number,
+			default: 0,
+		},
+		conditionalFormatting: {
+			type: Array as () => Record<string, any>[],
+			default: () => [],
+		},
+		textAlign: {
+			type: String as () => CSSProperties['text-align'],
+			default: 'center',
+		},
+		fontSize: {
+			type: String,
+			default: 'auto',
+		},
+		fontWeight: {
+			type: [Number, String],
+			default: 800,
+		},
+		fontStyle: {
+			type: String,
+			default: undefined,
+		},
+		font: {
+			type: String as () => 'sans-serif' | 'serif' | 'monospace',
+			default: 'sans-serif',
+		},
+	},
 	setup(props) {
 		const { t, n, locale } = useI18n();
 		const api = useApi();
