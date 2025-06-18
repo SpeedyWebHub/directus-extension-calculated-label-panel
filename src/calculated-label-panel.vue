@@ -233,6 +233,7 @@ export default defineComponent({
 		}
 
 		async function updateFit() {
+			console.log(`--> [calculated label panel] In updateFit, props.fontSize = ${props.fontSize}`); //
 			if (props.fontSize !== 'auto' || !props.data || props.data.length === 0) {
 				unmountResizeObserver();
 				return;
