@@ -282,6 +282,8 @@ export default defineComponent({
 				}
 			}
 
+			console.log(`Matching format: ${JSON.stringify(matchingFormat)}`);
+
 			return matchingFormat?.color || 'var(--theme--primary)';
 
 			function matchesOperator(format: Record<string, any>) {
