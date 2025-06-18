@@ -271,6 +271,8 @@ export default defineComponent({
 			if (isNil(calculatedLabelPanel.value.result)) return null;
 
 			console.log('IN COLOR AFTER NIL CHECK')
+			console.log(props)
+			console.log(`props.conditionalFormatting = ${JSON.stringify(props.conditionalFormatting)}`);
 
 			let matchingFormat = null;
 
