@@ -132,6 +132,7 @@ export default defineComponent({
 		let resizeObserver: ResizeObserver | null = null;
 
 		onMounted(() => {
+			console.log('--> [clp] In onmounted')
 			loadCalculatedLabelPanel();
 			updateFit();
 		});
@@ -145,6 +146,7 @@ export default defineComponent({
 		});
 
 		onUpdated(() => {
+			console.log('--> [clp] In onUpdated');
 			updateFit();
 		})
 
