@@ -290,7 +290,7 @@ export default defineComponent({
 					const value = calculatedLabelPanel.value.result;
 					const compareValue = format.value ?? '';
 
-					console.log(`COMPARE VALUE: (compareValue)`);
+					console.log(`COMPARE VALUE: (${compareValue})`);
 
 					switch (format.operator || '>=') {
 						case '=':
