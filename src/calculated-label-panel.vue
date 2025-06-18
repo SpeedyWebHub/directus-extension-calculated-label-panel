@@ -240,7 +240,8 @@ export default defineComponent({
 				unmountResizeObserver();
 				return;
 			}
-
+			
+			console.log("AWAITING FONTS READY");
 			await document.fonts.ready;
 			console.log("CALLING ADJUST PADDING");
 			adjustPadding();
