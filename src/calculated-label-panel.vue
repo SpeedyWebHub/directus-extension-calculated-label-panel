@@ -242,7 +242,9 @@ export default defineComponent({
 			}
 
 			await document.fonts.ready;
+			console.log("CALLING ADJUST PADDING");
 			adjustPadding();
+			console.log("CALLING ADJUST FONT SIZE")
 			adjustFontSize();
 
 			if (!resizeObserver) {

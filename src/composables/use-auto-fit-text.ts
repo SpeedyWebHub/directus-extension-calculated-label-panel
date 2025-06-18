@@ -40,6 +40,7 @@ function extractValues(paddingString: string): { top: number; right: number; bot
 
 export function useAutoFontFit(parent: Ref<HTMLElement | null>, child: Ref<HTMLElement | null>) {
 	const adjustFontSize = () => {
+		console.log("IN ADJUST FONT SIZE");
 		const parentContainer = parent.value;
 		const childContainer = child.value;
 
