@@ -270,6 +270,8 @@ export default defineComponent({
 			console.log(`[calculated-label] --> In color (computed): calculatedLabelPanel.value.result = ${calculatedLabelPanel.value.result}`);
 			if (isNil(calculatedLabelPanel.value.result)) return null;
 
+			console.log('IN COLOR AFTER NIL CHECK')
+
 			let matchingFormat = null;
 
 			for (const format of props.conditionalFormatting || []) {
