@@ -1,3 +1,9 @@
+## What's new in version 1.0.2 ?
+- fixed auto font size
+- fixed conditional formatting
+
+## Features Overview
+
 Available panel properties for configuring via the Directus Insights graphical user interface:
 - fields (example: `income.netto, expenses.netto`)
 - expression (example: `sum(attr(income, "netto")) - sum(attr(expenses, "netto"))`)
