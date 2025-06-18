@@ -238,7 +238,8 @@ export default defineComponent({
 			console.log(`--> [calculated label panel] In updateFit, props.fontSize = ${props.fontSize}`); //
 			console.log(props);
 			console.log(`--> [calculated label panel] In updateFit, props.data = ${props.data}`); //
-			if (props.fontSize !== 'auto' || !props.data || props.data.length === 0) {
+			//if (props.fontSize !== 'auto' || !props.data || props.data.length === 0) {
+			if (props.fontSize !== 'auto') {
 				unmountResizeObserver();
 				return;
 			}
