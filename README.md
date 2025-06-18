@@ -1,4 +1,4 @@
-## What's new in version 1.0.2 ?
+## What's new in version 1.0.3
 - fixed auto font size
 - fixed conditional formatting
 
