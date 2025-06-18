@@ -132,7 +132,7 @@ export default defineComponent({
 		let resizeObserver: ResizeObserver | null = null;
 
 		onMounted(() => {
-			console.log('--> [clp] In onmounted')
+			console.log('[calculated-label] --> In onmounted')
 			loadCalculatedLabelPanel();
 			updateFit();
 		});
@@ -146,7 +146,7 @@ export default defineComponent({
 		});
 
 		onUpdated(() => {
-			console.log('--> [clp] In onUpdated');
+			console.log('[calculated-label] --> In onUpdated');
 			updateFit();
 		})
 
@@ -168,7 +168,7 @@ export default defineComponent({
 		}
 		
 		async function loadCalculatedLabelPanel() {
-			console.log('[calculated-labelSDCDSC] --> SDCDCIn loadCalculatedLabelPanel XXASXYSUXHZB');
+			console.log('[calculated-label] --> In loadCalculatedLabelPanel');
 			console.log('[calculated-label] Calling getOperands')
 			const operands = getOperands(props);
 			console.log('[calculated-label] Calling sanitizeOperands');
@@ -235,20 +235,20 @@ export default defineComponent({
 		}
 
 		async function updateFit() {
-			console.log(`--> [calculated label panel] In updateFit, props.fontSize = ${props.fontSize}`); //
+			console.log(`[calculated-label] --> In updateFit, props.fontSize = ${props.fontSize}`); //
 			console.log(props);
-			console.log(`--> [calculated label panel] In updateFit, props.data = ${props.data}`); //
+			console.log(`[calculated-label] --> In updateFit, props.data = ${props.data}`); //
 			//if (props.fontSize !== 'auto' || !props.data || props.data.length === 0) {
 			if (props.fontSize !== 'auto') {
 				unmountResizeObserver();
 				return;
 			}
 			
-			console.log("AWAITING FONTS READY");
+			console.log("[calculated-label] --> AWAITING FONTS READY");
 			await document.fonts.ready;
-			console.log("CALLING ADJUST PADDING");
+			console.log("[calculated-label] --> CALLING ADJUST PADDING");
 			adjustPadding();
-			console.log("CALLING ADJUST FONT SIZE")
+			console.log("[calculated-label] --> CALLING ADJUST FONT SIZE")
 			adjustFontSize();
 
 			if (!resizeObserver) {
@@ -270,9 +270,9 @@ export default defineComponent({
 			console.log(`[calculated-label] --> In color (computed): calculatedLabelPanel.value.result = ${calculatedLabelPanel.value.result}`);
 			if (isNil(calculatedLabelPanel.value.result)) return null;
 
-			console.log('IN COLOR AFTER NIL CHECK')
+			console.log('[calculated-label] --> IN COLOR AFTER NIL CHECK')
 			console.log(props)
-			console.log(`props.conditionalFormatting = ${JSON.stringify(props.conditionalFormatting)}`);
+			console.log(`[calculated-label] --> props.conditionalFormatting = ${JSON.stringify(props.conditionalFormatting)}`);
 
 			let matchingFormat = null;
 
@@ -282,19 +282,19 @@ export default defineComponent({
 				}
 			}
 
-			console.log(`Matching format: ${JSON.stringify(matchingFormat)}`);
+			console.log(`[calculated-label] --> Matching format: ${JSON.stringify(matchingFormat)}`);
 
 			return matchingFormat?.color || 'var(--theme--primary)';
 
 			function matchesOperator(format: Record<string, any>) {
-				console.log(`[calculated-label] In matchesOperator: calculatedLabelPanel.value.result = ${calculatedLabelPanel.value.result}`);
+				console.log(`[calculated-label] --> In matchesOperator: calculatedLabelPanel.value.result = ${calculatedLabelPanel.value.result}`);
 				const resultIsNumber = !isNaN(Number(calculatedLabelPanel.value.result));
 				//if (typeof calculatedLabelPanel.value.result === 'string') {
 				if (!resultIsNumber) {
 					const value = calculatedLabelPanel.value.result;
 					const compareValue = format.value ?? '';
 
-					console.log(`COMPARE VALUE: (${compareValue})`);
+					console.log(`[calculated-label] --> COMPARE VALUE: (${compareValue})`);
 
 					switch (format.operator || '>=') {
 						case '=':
