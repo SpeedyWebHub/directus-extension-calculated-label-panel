@@ -288,7 +288,9 @@ export default defineComponent({
 
 			function matchesOperator(format: Record<string, any>) {
 				console.log(`[calculated-label] In matchesOperator: calculatedLabelPanel.value.result = ${calculatedLabelPanel.value.result}`);
-				if (typeof calculatedLabelPanel.value.result === 'string') {
+				const resultIsNumber = !isNaN(Number(calculatedLabelPanel.value.result));
+				//if (typeof calculatedLabelPanel.value.result === 'string') {
+				if (!resultIsNumber) {
 					const value = calculatedLabelPanel.value.result;
 					const compareValue = format.value ?? '';
 
